@@ -1,20 +1,15 @@
 ---
 
 galaxy_info:
-  author: Robert Readman
+  author: Jiri Tyr
   description: Installs Uchiwa dashboard for Sensu
   license: MIT
-  min_ansible_version: 1.9
+  min_ansible_version: 2.1
   platforms:
     - name: EL
       versions:
         - 6
+        - 7
   categories:
     - monitoring
-dependencies:
-  - role: common/yumrepo
-    yumrepo_repos:
-      uchiwa:
-        name: uchiwa
-        baseurl: "{{ uchiwa_yum_repo_url }}"
-        gpgcheck: 0
+dependencies: []

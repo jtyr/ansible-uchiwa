@@ -27,18 +27,18 @@ Examples
     uchiwa_sensu_site: "DataCentre 1"
     uchiwa_sensu_ssl_enabled: "true"
     uchiwa_sensu_timeout: 5
-    uchiwa_user: "uchiwa"
-    uchiwa_password: "password"
+    uchiwa_uchiwa_user: "uchiwa"
+    uchiwa_uchiwa_password: "password"
   roles:
     - uchiwa
 
 # Example of how to add more Sensu servers
 - hosts: myhost3
   vars:
-    uchiwa_sensu:
-      - name: Sensu1
-        ...
+    uchiwa_sensu__custom:
       - name: Sensu2
+        ...
+      - name: Sensu3
         ...
   roles:
     - uchiwa
@@ -47,15 +47,17 @@ Examples
 See [Uchiwa documentation](https://uchiwa.io/#/docs/config) for more information
 about the configuration.
 
-This role requires [Config Encoder
-Macros](https://github.com/picotrading/config-encoder-macros) which must be
-placed into the same directory as the playbook:
+This role requires [Config
+Encoders](https://github.com/jtyr/ansible/blob/jtyr-config_encoders/lib/ansible/plugins/filter/config_encoders.py)
+which must be configured in the `ansible.cfg` file like this:
 
 ```
-$ ls -1 *.yaml
-site.yaml
-$ git clone https://github.com/picotrading/config-encoder-macros.git ./templates/encoder
+[defaults]
+
+filter_plugins = ./plugins/filter/
 ```
+
+Where the `./plugins/filter/` containes the `config_encoders.py` file.
 
 
 Role variables
@@ -65,15 +67,19 @@ List of variables used by the role:
 
 ```
 # YUM repo URL
-uchiwa_yum_repo_url: http://repos.sensuapp.org/yum/el/$releasever/$basearch/
+uchiwa_yumrepo_url: http://repos.sensuapp.org/yum/el/$releasever/$basearch/
 
-# Package to be installed (you can force a specific version here)
+# Custom yumrepo params
+uchiwa_yumrepo_params: {}
+
+# Package to be installed (exlicit version can be specified here)
 uchiwa_pkg: uchiwa
 
 # Allow uchiwa to bind to TCP port <1024
 uchiwa_allow_low_port: false
 
-# Default Sensu config variables
+
+# Default values of the Sensu part of the config
 uchiwa_sensu_site: Sensu
 uchiwa_sensu_host: 127.0.0.1
 uchiwa_sensu_ssl_enabled: "false"
@@ -83,8 +89,8 @@ uchiwa_sensu_pass: ""
 uchiwa_sensu_path: ""
 uchiwa_sensu_timeout: 5000
 
-# Default Sensu config
-uchiwa_sensu:
+# Default Sensu part of the config
+uchiwa_sensu__default:
   - name: "{{ uchiwa_sensu_site }}"
     host: "{{ uchiwa_sensu_host }}"
     ssl: "{{ uchiwa_sensu_ssl_enabled }}"
@@ -94,30 +100,56 @@ uchiwa_sensu:
     path: "{{ uchiwa_sensu_path }}"
     timeout: "{{ uchiwa_sensu_timeout }}"
 
-# Default Uchiwa config variables
-uchiwa_host: 0.0.0.0
-uchiwa_port: 3000
-uchiwa_user: admin
-uchiwa_pass: admin
-uchiwa_refresh: 10000
+# Custom Sensu part of the config
+uchiwa_sensu__custom: []
 
-# Default Uchiwa config
-uchiwa_config:
+# Final Sensu part of the config
+uchiwa_sensu: "{{
+  uchiwa_sensu__default +
+  uchiwa_sensu__custom }}"
+
+# Default values of the Uchiwa part of the config
+uchiwa_uchiwa_host: 0.0.0.0
+uchiwa_uchiwa_port: 3000
+uchiwa_uchiwa_user: admin
+uchiwa_uchiwa_pass: admin
+uchiwa_uchiwa_refresh: 10000
+
+# Default Uchiwa part of the config
+uchiwa_uchiwa__default:
+  host: "{{ uchiwa_uchiwa_host }}"
+  user: "{{ uchiwa_uchiwa_user }}"
+  pass: "{{ uchiwa_uchiwa_pass }}"
+  port: "{{ uchiwa_uchiwa_port }}"
+  refresh: "{{ uchiwa_uchiwa_refresh }}"
+
+# Custom Uchiwa part of the config
+uchiwa_uchiwa__custom: {}
+
+# Final Uchiwa part of the config
+uchiwa_uchiwa: "{{
+  uchiwa_uchiwa__default.update(uchiwa_uchiwa__custom) }}{{
+  uchiwa_uchiwa__default }}"
+
+# Default config
+uchiwa_config__default:
   sensu: "{{ uchiwa_sensu }}"
-  uchiwa:
-    host: "{{ uchiwa_host }}"
-    user: "{{ uchiwa_user }}"
-    pass: "{{ uchiwa_pass }}"
-    port: "{{ uchiwa_port }}"
-    refresh: "{{ uchiwa_refresh }}"
+  uchiwa: "{{ uchiwa_uchiwa }}"
+
+# Custom config
+uchiwa_config__custom: {}
+
+# Final config
+uchiwa_config: "{{
+  uchiwa_config__default.update(uchiwa_config__custom) }}{{
+  uchiwa_config__default }}"
 ```
 
 
 Dependencies
 ------------
 
-* [`yumrepo`](https://github.com/picotrading/ansible-yumrepo) role
-* [Config Encoder Macros](https://github.com/picotrading/config-encoder-macros)
+- [Config Encoders](https://github.com/jtyr/ansible/blob/jtyr-config_encoders/lib/ansible/plugins/filter/config_encoders.py)
 
 
 License
@@ -129,4 +161,4 @@ MIT
 Author
 ------
 
-Robert Readman, Jiri Tyr
+Jiri Tyr
