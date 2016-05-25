@@ -3,7 +3,7 @@ uchiwa
 
 Role to install Uchiwa dashboard for Sensu.
 
-The configuraton of the role is done in such way that it should not be necessary
+The configuration of the role is done in such way that it should not be necessary
 to change the role for any kind of configuration. All can be done either by
 changing role parameters or by declaring completely new configuration as a
 variable. That makes this role absolutely universal. See the examples below for
@@ -46,18 +46,6 @@ Examples
 
 See [Uchiwa documentation](https://uchiwa.io/#/docs/config) for more information
 about the configuration.
-
-This role requires [Config
-Encoders](https://github.com/jtyr/ansible/blob/jtyr-config_encoders/lib/ansible/plugins/filter/config_encoders.py)
-which must be configured in the `ansible.cfg` file like this:
-
-```
-[defaults]
-
-filter_plugins = ./plugins/filter/
-```
-
-Where the `./plugins/filter/` containes the `config_encoders.py` file.
 
 
 Role variables
@@ -149,7 +137,7 @@ uchiwa_config: "{{
 Dependencies
 ------------
 
-- [Config Encoders](https://github.com/jtyr/ansible/blob/jtyr-config_encoders/lib/ansible/plugins/filter/config_encoders.py)
+*- [`config_encoder_filters`](https://github.com/jtyr/ansible-config_encoder_filters)
 
 
 License
