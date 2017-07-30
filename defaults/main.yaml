@@ -1,7 +1,7 @@
 ---
 
 # YUM repo URL
-uchiwa_yumrepo_url: http://repos.sensuapp.org/yum/el/$releasever/$basearch/
+uchiwa_yumrepo_url: https://sensu.global.ssl.fastly.net/yum/$releasever/$basearch/
 
 # Custom yumrepo params
 uchiwa_yumrepo_params: {}
